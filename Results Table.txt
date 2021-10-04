@@ -1,0 +1,224 @@
+Data - SPY JULY 2015- JULY 2020 (Daily)
+
+
+Model 1 - 
+model = Sequential()
+model.add(Conv1D(filters=300, kernel_size=5, strides=1, padding='causal', activation='relu', input_shape = [T,k]))
+model.add(BatchNormalization())
+model.add(LSTM(units=300, return_sequences=True, activation='tanh'))
+model.add(Dropout(0.2))
+model.add(BatchNormalization())
+model.add(LSTM(units=200, activation='tanh', return_sequences=True))
+model.add(Dropout(0.2))
+model.add(LSTM(units=200, activation='tanh', return_sequences= True))
+model.add(Dropout(0.1))
+model.add(LSTM(units=150, activation='tanh', return_sequences= True))
+model.add(Dropout(0.1))
+model.add(LSTM(units=150, activation='tanh'))
+model.add(Dense(100))
+model.add(Dropout(0.2))
+model.add(Dense(20))
+model.add(Dense(T_pred))
+
+
+Single-feature(Close)
+T	T_pred		RMS		STD		MAPE		R		Theil U		DWT
+4	1		7.03		21.43		0.02		0.95		0.01		No
+4	1		10.11		21.43		0.03		0.93		0.02		Sym8, soft, Bayes
+4	1		10.15		21.43		0.03		0.94		0.02		Sym9, soft, Bayes
+4 	1		9.65		21.43		0.02		0.94		0.02		Sym9, soft, Visu
+4	1		11.66		21.43		0.03		0.92		0.02		Coif7, soft, Visu
+4   	1		10.48		21.43		0.03		0.92		0.02		Coif7, soft, Bayes
+5	5		10.15		21.47		0.03		0.91		0.02		No
+15 	15		20.77		21.80		0.06		0.69		0.04		No
+30	15		20.08		21.80		0.06		0.71		0.04		No	
+60	15		27.27		21.80		0.07		0.33		0.05		No
+30	30		31.07		21.80		0.09		0.38		0.05		No
+30	30		29.57		21.80		0.08		0.56		0.05		Sym9, soft, Visu
+60	30		29.65		21.80		0.08		0.22		0.05		No
+45 	30		32.74		21.80		0.09		0.44		0.06		No
+
+
+Multi-feature(Close, Open, Volume)
+T	T_pred		RMS		STD		MAPE		R		Theil U		DWT
+4	1		13.11		21.43		0.03		0.91		0.02		No
+
+
+Multi-feature(Close, Open, Volume, USD Index)		
+T	T_pred		RMS		STD		MAPE		R		Theil U		DWT
+4	1		15.17		21.43		0.041		0.89		0.026		No
+
+
+
+
+
+
+#Encoder-Decoder model
+Model 2 -
+model = Sequential()
+model.add(Conv1D(filters=64, kernel_size=3, activation='relu', input_shape=(T,k)))
+#model.add(Conv1D(filters=64, kernel_size=3, activation='relu'))
+model.add(MaxPooling1D(pool_size=2))
+model.add(LSTM(200, activation='tanh', return_sequences=True))
+model.add(Dropout(0.2))
+model.add(LSTM(200, activation='tanh'))
+model.add(RepeatVector(T_pred))
+model.add(LSTM(200, activation='tanh', return_sequences=True))
+model.add(Dropout(0.2))
+model.add(LSTM(200, activation='tanh', return_sequences=True))
+model.add(TimeDistributed(Dense(100)))
+model.add(TimeDistributed(Dense(1)))
+
+
+Single-feature(Close)
+T	T_pred		RMS		STD		MAPE		R		Theil U		DWT
+4	1		6.22		21.43		0.01		0.96		0.01		No
+4	1		6.23		21.43		0.02		0.96		0.01		Sym9, soft, Visu
+4	1		6.03		21.43		0.01		0.96		0.01		Sym9, soft, Bayes
+4	1		6.52		21.43		0.02		0.96		0.01		Coif7, soft, Bayes
+4	1		5.03		21.43		0.012		0.97		0.008		coif3, soft, Visu
+5	5		11.14		21.47		0.03		0.87		0.02		No
+15	15		22.86		21.80		0.06		0.38		0.04		No
+30	30		21.57		21.80		0.06		0.60		0.04		Sym9, soft, Bayes
+30	30		23.71		21.80		0.06		0.35		0.04		Sym9, soft, Visu			
+30	30		19.80		21.80		0.05		0.60		0.03		Sym9, soft, Bayes, Levels=5
+30	30		23.75		21.80		0.06		0.34		0.04		db7, soft, Bayes
+30	30		19.25		21.80		0.05		0.57		0.03		Sym15, soft, Bayes
+30	30		23.80		21.80		0.06		0.31		0.03		Sym15, soft, Bayes, Levels=5
+30	30		38.00		21.80		0.10		0.19		0.07		Sym2, soft, Bayes
+30	30		23.28		21.80		0.06		0.36		0.04		Sym20, soft, Bayes
+30	30		19.62		21.80		0.052		0.55		0.033		coif3, soft, Visu
+
+
+Multi-feature(Close, Open, Volume)
+T	T_pred		RMS		STD		MAPE		R		Theil U		DWT	
+4	1		5.69		21.43		0.01		0.97		0.01		No
+4	1		5.57		21.43		0.01		0.97		0.01		Sym9, soft, Bayes
+4	1		6.00		21.43		0.01		0.97		0.01		Sym9, soft, Bayes, Levels=5
+4	1		5.44		21.43		0.01		0.97		0.01		Sym15, soft, Bayes
+4	1		5.69		21.43		0.01		0.97		0.01		Sym20, soft, Bayes
+4	1		4.69		21.43		0.010		0.98		0.008		coif3, soft, Visu
+5	5		9.91		21.47		0.01		0.97		0.01		No	
+15	15		20.38		21.80		0.06		0.63		0.03		No
+30	15		23.11		21.80		0.06		0.66		0.04		No
+30	30		23.99		21.80		0.07		0.59		0.04		No
+30	30		32.83		21.80		0.09		0.34		0.06		Sym15, soft, Bayes, Levels=5
+30	30		23.51		21.80		0.07		0.59		0.04		Sym15, soft, Bayes
+30	30		24.43		21.80		0.07		0.54		0.04		Sym9, soft, Bayes
+30	30		23.79		21.80		0.07		0.46		0.04		Sym15, soft, Visu
+30	30		33.37		21.80		0.092		0.26		0.058		coif3, soft, Visu		
+45	30		33.35		21.80		0.10		0.38		0.06		No
+45	30		26.06		21.80		0.07		0.18		0.04		Sym15, soft, Bayes	
+45	45		35.16		21.80		0.11		0.36		0.06		No
+
+
+Multi-feature(Close, Open, Volume, USD INDEX)
+T	T_pred		RMS		STD		MAPE		R		Theil U		DWT
+4	1		6.34		21.43		0.02		0.96		0.01		No
+4	1		5.60		21.43		0.012		0.97		0.009		Sym15, soft, Bayes
+4	1		4.91		21.43		0.011		0.97		0.008		coif3, soft, Visu
+4	1		5.79		21.43		0.013		0.96		0.010		coif3, soft, Bayes
+30	30		28.02		21.80		0.078		0.55		0.048		Sym15, soft, Bayes
+30	30		25.69		21.80		0.072		0.28		0.044		Sym9, soft, Bayes
+30	30		33.37		21.80		0.092		0.26		0.058		coif3, soft, Visu
+45	30		29.87		21.80		0.084		0.51		0.051		Sym15, soft, Bayes
+
+
+Multi-feature(Close, 3 Mo Int Rate, 1 Yr Int Rate)
+T	T_pred		RMS		STD		MAPE		R		Theil U		DWT
+4	1		22.96		21.43		0.059		0.73		0.039		Sym15, soft, Bayes
+4	1		16.05		21.43		0.041		0.83		0.027		No
+4	1		16.80		21.43		0.044		0.83		0.028		coif3, soft, Visu
+30	30		39.67		21.80		0.104		-0.07		0.068		No
+45	30		50.62		21.80		0.128		-0.13		0.088		No
+
+
+Multi-feature(Close, Open, Volume, USD INDEX3 Mo Int Rate, 1 Yr Int Rate)
+T	T_pred		RMS		STD		MAPE		R		Theil U		DWT
+4	1		11.66		21.43		0.032		0.92		0.020		No
+4	1		14.96		21.43		0.040		0.88		0.025		coif3, soft, Visu
+30	30		44.67		21.80		0.116		-0.01		0.077		No
+
+
+Multi-feature(Close, 1 Mo Int Rate, 2 Mo Int Rate, 3 Mo Int Rate, 1 Yr Int Rate, 3 Yr Int Rate, 10 Yr Int Rate)
+T	T_pred		RMS		STD		MAPE		R		Theil U		DWT
+4	1		16.51		21.43		0.042		0.79		0.028		No
+4	1		16.05		21.43		0.041		0.84		0.027		coif3, soft, Visu
+
+
+#Encoder-Decoder Self-Attention(Bahdanau Style) model
+Model 3 -
+model = Sequential()
+model.add(Conv1D(filters=64, kernel_size=3, activation='relu', input_shape=(T,k)))
+#model.add(Conv1D(filters=64, kernel_size=3, activation='relu'))
+model.add(MaxPooling1D(pool_size=2))
+model.add(LSTM(200, activation='tanh', return_sequences=True))
+model.add(Dropout(0.2))
+model.add(LSTM(200, activation='tanh'))
+model.add(RepeatVector(T_pred))
+model.add(SeqSelfAttention(attention_activation='sigmoid'))
+model.add(LSTM(200, activation='tanh', return_sequences=True))
+model.add(Dropout(0.2))
+model.add(LSTM(200, activation='tanh', return_sequences=True))
+model.add(TimeDistributed(Dense(100)))
+model.add(TimeDistributed(Dense(1)))
+
+
+Single-feature(Close)
+T	T_pred		RMS		STD		MAPE		R		Theil U		DWT
+30	30		18.33		21.80		0.0049		0.69		0.031		Sym15, soft, Bayes
+
+
+Multi-feature(Close, Open, Volume)
+T	T_pred		RMS		STD		MAPE		R		Theil U		DWT	
+30	30		19.74		21.80		0.053		0.70		0.033		Sym9, soft, Bayes
+
+
+Multi-feature(Close, Open, Volume, USD INDEX)
+T	T_pred		RMS		STD		MAPE		R		Theil U		DWT
+30	30		20.44		21.80		0.055		0.71		0.034		Sym9, soft, Bayes
+
+
+
+
+
+
+
+#Encoder-Decoder model with decoder input(without teacher forcing)
+Model - 4
+
+
+Multi-feature(Close, Open, Volume)
+T	T_pred		RMS		STD		MAPE		R		Theil U		DWT
+30	30		16.32		21.80		0.043		0.77		0.027		Sym15, soft, Bayes
+4	1		5.31		21.43		0.012		0.97		0.009		Sym15, soft, Bayes
+4	1		4.96		21.43		0.011		0.97		0.008		coif3, soft, Visu
+
+
+
+
+PMI Indicator
+NMI Indicator
+
+
+
+Notes-
+Implied Volatility is high -> people expect the stock to make large movements(they are willing to pay more premium on options)
+Implied Volatility is low -> people expect the stock to make small movements(they are willing to less premium on options)
+We can get an expected range on the stock movement using the IV
+
+
+username: Tamanna19
+password: Tas6@Tam
+ivolatility.com
+
+
+TESLA and APPLE 21 and 24 August(22 and 23 closed market) predictions using daily data.
+30 minute interval data predictions. (TESLA, AAPL).
+
+128, 128, 144 		64, 64, 192
+
+
+
+
+
